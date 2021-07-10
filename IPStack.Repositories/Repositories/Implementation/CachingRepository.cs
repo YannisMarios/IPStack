@@ -3,6 +3,8 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace IPStack.Repositories.Repositories.Implementation
@@ -29,7 +31,7 @@ namespace IPStack.Repositories.Repositories.Implementation
         /// <value>
         /// The cache key.
         /// </value>
-        protected string CacheKey { get; }
+        protected string _cacheKey { get; }
         #endregion
 
         #region Constructor
@@ -39,10 +41,10 @@ namespace IPStack.Repositories.Repositories.Implementation
         /// <param name="configuration"></param>
         /// <param name="dbContext">The database context.</param>
         /// <param name="cache">The cache.</param>
-        protected CachingRepository(IConfiguration configuration, IPStackDbContext dbContext, IMemoryCache cache) : base(dbContext)
+        protected CachingRepository(IConfiguration configuration, IPStackDbContext dbContext, IMemoryCache cache, string cacheKey) : base(dbContext)
         {
             _cache = cache;
-            CacheKey = typeof(T).FullName;
+            _cacheKey = cacheKey ?? throw new ArgumentNullException(nameof(cacheKey));
             var absoluteExpiration = configuration.GetValue<int>("Caching:AbsoluteExpirationInMinutes");
             var slidingExpirationInMinutes = configuration.GetValue<int>("Caching:SlidingExpirationInMinutes");
             _options = new MemoryCacheEntryOptions()
@@ -53,81 +55,31 @@ namespace IPStack.Repositories.Repositories.Implementation
         #endregion
 
         #region Public Methods
-        public override T Add(T entity)
+        public async Task<T> GetByKey(string key)
         {
-            AddToCache(entity);
-            return base.Add(entity);
-        }
+            var cachedEntity = _cache.Get<T>(key);
 
-        public override IEnumerable<T> AddRange(IEnumerable<T> entities)
-        {
-            AddManyToCache(entities);
-            return base.AddRange(entities);
-        }
-
-        public override void DeleteRange(IEnumerable<T> entities)
-        {
-            _cache.Remove(CacheKey);
-            base.DeleteRange(entities);
-        }
-
-        public override async Task<T> FindAsync(params object[] keyValues)
-        {
-            var cachedEntity = _cache.Get<T>(CacheKey);
-
-            if (cachedEntity != null)
+            if(cachedEntity is null)
             {
-                return cachedEntity;
-            } 
-            else
-            {
-                cachedEntity = await base.FindAsync(keyValues);
-                AddToCache(cachedEntity);
+                var predicate = GeneratePredicateForValue(_cacheKey, key);
+                cachedEntity = await base.GetAsync(predicate);
+                if (cachedEntity != null)
+                { 
+                    AddToCache(cachedEntity);
+                }
             }
 
             return cachedEntity;
         }
-
-        public override async Task<IEnumerable<T>> GetAllAsync()
-        {
-            var cachedEntities = _cache.Get<IEnumerable<T>>(CacheKey);
-
-            if (cachedEntities != null)
-            {
-                return cachedEntities;
-            }
-            else
-            {
-                cachedEntities = await base.GetAllAsync();
-                AddManyToCache(cachedEntities);
-            }
-            return cachedEntities;
-        }
-
-        public override T Update(T entity)
-        {
-            _cache.Remove(CacheKey);
-            return base.Update(entity);
-        }
-
-        public override IEnumerable<T> UpdateRange(IEnumerable<T> entities)
-        {
-            _cache.Remove(CacheKey);
-            return base.UpdateRange(entities);
-        }
         #endregion
+
 
         #region Protected Methods
         protected void AddToCache(T entry)
         {
-            _cache.Remove(CacheKey);
-            _cache.Set(CacheKey, entry, _options);
-        }
-
-        protected void AddManyToCache(IEnumerable<T> entries)
-        {
-            _cache.Remove(CacheKey);
-            _cache.Set(CacheKey, entries, _options);
+            var key = typeof(T).GetProperty(_cacheKey).GetValue(entry);
+            _cache.Remove(key);
+            _cache.Set(key, entry, _options);
         }
         #endregion
     }

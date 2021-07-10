@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
+using IPStack.Business;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace IPStack.WebApi.Controllers
@@ -12,15 +11,23 @@ namespace IPStack.WebApi.Controllers
     [ApiController]
     public class IPDetailsController : BaseController
     {
-        #region Constructor
+        #region Private Members
 
+        /// <summary>
+        /// The IP details service
+        /// </summary>
+        private readonly IIPDetailsService _ipdetailsService;
+
+        #endregion
+
+        #region Constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="IPDetailsController"/> class.
         /// </summary>
         /// <param name="mapper">The mapper.</param>
-        public IPDetailsController(IMapper mapper) : base( mapper)
+        public IPDetailsController(IMapper mapper, IIPDetailsService ipDetailsService) : base( mapper)
         {
-            
+            _ipdetailsService = ipDetailsService ?? throw new ArgumentNullException(nameof(ipDetailsService));
         }
 
         #endregion
@@ -30,14 +37,14 @@ namespace IPStack.WebApi.Controllers
         /// <summary>
         /// Gets the details of an IP address
         /// </summary>
-        /// <param name="ipAddress">The IP address</param>
+        /// <param name="ip">The IP address</param>
         /// <returns>An <see cref="IActionResult"/></returns>
         [HttpGet]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetSingleIPDetails([FromQuery] string ipAddress)
+        public async Task<IActionResult> GetSingleIPDetails([FromQuery] string ip)
         {
-            
-            return Ok();
+            var ipDetails = await _ipdetailsService.GetIPDetails(ip);
+            return Ok(ipDetails);
         }
         #endregion
 

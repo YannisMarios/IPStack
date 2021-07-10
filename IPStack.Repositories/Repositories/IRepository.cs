@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -58,5 +59,7 @@ namespace IPStack.Repositories.Repositories
         /// <param name="entities">The entities.</param>
         /// <returns>A <see cref="IEnumerable{TEntity}"/></returns>
         IEnumerable<TEntity> UpdateRange(IEnumerable<TEntity> entities);
+
+        Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> predicate);
     }
 }

@@ -16,8 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\IPStack.Business\IPStack.Business.csproj" />
     <ProjectReference Include="..\IPStack.Provider\IPStack.Adapter.csproj" />
     <ProjectReference Include="..\IPStack.Repositories\IPStack.Repositories.csproj" />
+    <ProjectReference Include="..\IPStack.UoW\IPStack.UoW.csproj" />
   </ItemGroup>
 
 

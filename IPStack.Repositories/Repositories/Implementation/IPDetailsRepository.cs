@@ -1,6 +1,9 @@
 ﻿using IPStack.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IPStack.Repositories.Repositories.Implementation
 {
@@ -15,8 +18,15 @@ namespace IPStack.Repositories.Repositories.Implementation
         /// <param name="dbContext">The database context.</param>
         /// <param name="cache">The cache.</param>
         public IPDetailsRepository(IConfiguration configuration, IPStackDbContext dbContext, IMemoryCache cache) 
-            : base(configuration, dbContext, cache)
+            : base(configuration, dbContext, cache, "IP")
         {
+        }
+        #endregion
+
+        #region Public Methods
+        public async Task<IPDetails> GetIPDetails(string ip)
+        {
+            return await GetByKey(ip);
         }
         #endregion
     }

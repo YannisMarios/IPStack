@@ -3,6 +3,7 @@ using IPStack.Repositories.Repositories;
 using IPStack.Repositories.Repositories.Implementation;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
 
 namespace IPStack.UoW.Implementation
 {
@@ -22,11 +23,25 @@ namespace IPStack.UoW.Implementation
             _dbContext = dbContext;
             _cache = cache;
         }
+        #endregion
 
+        #region Public Methods
         public IIPDetailsRepository IPDetailsRepository
         {
             get => _ipDetailsRepository ??= new IPDetailsRepository(_configuration, _dbContext, _cache);
         }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _dbContext.SaveChangesAsync();
+        }
+
+        public void RollBack()
+        {
+            _dbContext.Dispose();
+        }
         #endregion
+
+
     }
 }

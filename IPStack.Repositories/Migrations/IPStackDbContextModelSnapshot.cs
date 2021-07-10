@@ -34,6 +34,9 @@ namespace IPStack.Repositories.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("IP")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Latitude")
                         .HasColumnType("nvarchar(max)");
 

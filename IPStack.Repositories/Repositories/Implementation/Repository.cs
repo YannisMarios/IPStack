@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -74,6 +75,21 @@ namespace IPStack.Repositories.Repositories.Implementation
             DbContext.Set<T>().AttachRange(entities);
             DbContext.Set<T>().UpdateRange(entities);
             return entities;
+        }
+
+        public virtual async Task<T> GetAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await DbContext.Set<T>().FirstOrDefaultAsync(predicate);
+        }
+        #endregion
+
+        #region Protected Methods
+        protected static Expression<Func<T, bool>> GeneratePredicateForValue(string propertyName, string value)
+        {
+            var propertyExpression = Expression.Parameter(typeof(T), "x");
+            var memberExpression = Expression.Property(propertyExpression, propertyName);
+            var constantExpression = Expression.Constant(value);
+            return Expression.Lambda<Func<T, bool>>(Expression.Equal(memberExpression, constantExpression), propertyExpression);
         }
         #endregion
     }

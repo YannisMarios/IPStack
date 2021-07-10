@@ -4,19 +4,22 @@ namespace IPStack.Adapter.Model
 {
     public partial class ApiResponse
     {
+        [JsonProperty("ip")]
+        public string IP { get; set; }
+
         [JsonProperty("city")]
         public string City { get ; set; }
 
         [JsonProperty("country_name")]
         public string Country { get ; set ; }
 
-        [JsonProperty("country_name")]
+        [JsonProperty("continent_name")]
         public string Continent { get ; set ; }
 
-        [JsonProperty("country_name")]
+        [JsonProperty("latitude")]
         public string Latitude { get ; set ; }
 
-        [JsonProperty("country_name")]
+        [JsonProperty("longitude")]
         public string Longitude { get ; set ; }
     }
 }

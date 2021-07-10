@@ -50,14 +50,14 @@ namespace IPStack.Adapter.Implementation
         #endregion
 
         #region Public Methods
-        public async Task<IPDetails> GetDetails(string ipAddress)
+        public async Task<IPDetails> GetDetails(string ip)
         {
-            if(ipAddress is null)
+            if(ip is null)
             {
-                throw new ArgumentNullException(nameof(ipAddress));
+                throw new ArgumentNullException(nameof(ip));
             }
 
-            var uri = BuildUri(ipAddress);
+            var uri = BuildUri(ip);
             var response = await _httpClient.GetAsync(uri);
 
             IPDetails details;
@@ -77,14 +77,14 @@ namespace IPStack.Adapter.Implementation
         #endregion
 
         #region Private Methods
-        private Uri BuildUri(string ipAddress)
+        private Uri BuildUri(string ip)
         {
-            if(ipAddress is null)
+            if(ip is null)
             {
-                throw new ArgumentNullException(nameof(ipAddress));
+                throw new ArgumentNullException(nameof(ip));
             }
 
-            return new Uri($"{_apiUrl}/{ipAddress}?access_key={_accessKey}");
+            return new Uri($"{_apiUrl}/{ip}?access_key={_accessKey}");
         }
         #endregion
     }
