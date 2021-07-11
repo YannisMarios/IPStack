@@ -25,7 +25,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPStack.UoW", "IPStack.UoW\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPStack.Business", "IPStack.Business\IPStack.Business.csproj", "{BB8C9E24-9AB7-44A9-9C5A-467B6999CC8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPStack.WorkerService", "IPStack.WorkerService\IPStack.WorkerService.csproj", "{4D1061B1-1494-4A8A-9255-9F06D2BF5A6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPStack.WorkerService", "IPStack.WorkerService\IPStack.WorkerService.csproj", "{4D1061B1-1494-4A8A-9255-9F06D2BF5A6F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6.SolutionItems", "6.SolutionItems", "{19677DF4-7A83-48DD-9649-AEEE9A4B42B0}"
+	ProjectSection(SolutionItems) = preProject
+		IPAddresses.json = IPAddresses.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

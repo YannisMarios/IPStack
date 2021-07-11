@@ -9,6 +9,7 @@ namespace IPStack.Business
     {
         public static IServiceCollection AddIPStackBusinessServices(this IServiceCollection services)
         {
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IIPDetailsService, IPDetailsService>();
 
             return services;

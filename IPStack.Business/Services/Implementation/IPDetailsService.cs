@@ -23,7 +23,8 @@ namespace IPStack.Business.Services.Implementation
         #endregion
 
         #region Constructor
-        public IPDetailsService(IUnitOfWork unitOfWork, IIPInfoProvider ipInfoProvider) : base(unitOfWork, ipInfoProvider)
+        public IPDetailsService(IUnitOfWork unitOfWork, IIPInfoProvider ipInfoProvider, IMapper mapper) 
+            : base(unitOfWork, ipInfoProvider, mapper)
         {
         }
         #endregion
@@ -108,15 +109,10 @@ namespace IPStack.Business.Services.Implementation
                         var entity = entities.FirstOrDefault(x => x.Id == item.Id);
                         if (entity != null)
                         {
-                            entity.IP = item.IP;
-                            entity.City = item.City;
-                            entity.Country = item.Country;
-                            entity.Continent = item.Continent;
-                            entity.Latitude = item.Latitude;
-                            entity.Longitude = item.Longitude;
+                            _ = Mapper.Map(item, entity);
                         }
                     }
-                    job.Progress += 10;
+                    job.Progress += batch.Count();
                     job.Status = job.Progress == job.Total ? JobStatusEnum.COMPLETED : JobStatusEnum.INPROGRESS;
                     UnitOfWork.IPDetailsRepository.UpdateRange(entities);
                     UnitOfWork.JobRepository.Update(job);
@@ -143,7 +139,7 @@ namespace IPStack.Business.Services.Implementation
                 throw new InvalidOperationException($"Job with id: {jobId} has completed");
             }
 
-            return $"{job.Progress}/{job.Total}";
+            return $"Update progress: {job.Progress}/{job.Total}";
         }
         #endregion
     }

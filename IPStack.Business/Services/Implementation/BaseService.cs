@@ -1,4 +1,5 @@
-﻿using IPStack.Adapter;
+﻿using AutoMapper;
+using IPStack.Adapter;
 using IPStack.UoW;
 
 namespace IPStack.Business.Services.Implementation
@@ -22,14 +23,23 @@ namespace IPStack.Business.Services.Implementation
         protected IIPInfoProvider IPInfoProvider { get; }
 
         /// <summary>
+        /// Gets the AutoMapper
+        /// </summary>
+        /// <value>
+        /// The AutoMapper.
+        /// </value>
+        protected IMapper Mapper { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BaseService"/> class.
         /// </summary>
         /// <param name="unitOfWork">The unit of work.</param>
         /// <param name="ipInfoProvider">The IP info provider.</param>
-        public BaseService(IUnitOfWork unitOfWork, IIPInfoProvider ipInfoProvider)
+        public BaseService(IUnitOfWork unitOfWork, IIPInfoProvider ipInfoProvider, IMapper mapper)
         {
             UnitOfWork = unitOfWork;
             IPInfoProvider = ipInfoProvider;
+            Mapper = mapper;
         }
     }
 }
