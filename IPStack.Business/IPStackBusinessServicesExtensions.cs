@@ -1,8 +1,8 @@
-﻿using IPStack.Business.Implementation;
+﻿using IPStack.Business.Services;
+using IPStack.Business.Services.Implementation;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-[assembly: CLSCompliant(false)]
 namespace IPStack.Business
 {
     public static class IPStackBusinessServicesExtensions

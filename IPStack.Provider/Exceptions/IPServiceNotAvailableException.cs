@@ -8,6 +8,10 @@ namespace IPStack.Adapter.Exceptions
         {
         }
 
+        /// <summary>
+        /// Constructor to be used when we have a general validation error.
+        /// </summary>
+        /// <param name="message">The error message we want to be returned.</param>
         public IPServiceNotAvailableException(string message)
             : base(message)
         {

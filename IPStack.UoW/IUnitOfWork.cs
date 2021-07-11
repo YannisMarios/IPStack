@@ -14,6 +14,14 @@ namespace IPStack.UoW
         IIPDetailsRepository IPDetailsRepository { get; }
 
         /// <summary>
+        /// Gets the Jobs repository.
+        /// </summary>
+        /// <value>
+        /// The Jobs repository.
+        /// </value>
+        IJobRepository JobRepository { get; }
+
+        /// <summary>
         /// Saves the changes asynchronous.
         /// </summary>
         /// <returns></returns>

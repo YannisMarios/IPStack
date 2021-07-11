@@ -4,7 +4,6 @@ using IPStack.Adapter.Implementation;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-[assembly: CLSCompliant(false)]
 namespace IPStack
 {
     public static class IPInfoProviderServicesExtensions

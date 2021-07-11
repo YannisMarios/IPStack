@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -27,6 +28,11 @@ namespace IPStack.Repositories.Repositories.Implementation
         public async Task<IPDetails> GetIPDetails(string ip)
         {
             return await GetByKey(ip);
+        }
+
+        public async Task<IEnumerable<IPDetails>> GetManyByIDs(IEnumerable<int> ids)
+        {
+            return await DbContext.IPDetails.Where(x => ids.Contains(x.Id)).ToListAsync();
         }
         #endregion
     }

@@ -71,6 +71,30 @@ namespace IPStack.Repositories.Repositories.Implementation
 
             return cachedEntity;
         }
+
+        public override async Task<IEnumerable<T>> GetAllAsync()
+        {
+            var entities = await base.GetAllAsync();
+            if(entities.Any())
+            {
+                foreach (var entity in entities)
+                {
+                    AddToCache(entity);
+                }
+            }
+
+            return entities;
+        }
+
+        public override IEnumerable<T> UpdateRange(IEnumerable<T> entities)
+        {
+            var dbEntities = base.UpdateRange(entities);
+            foreach(var entity in entities)
+            {
+                AddToCache(entity);
+            }
+            return dbEntities;
+        }
         #endregion
 
 

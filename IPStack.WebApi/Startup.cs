@@ -1,9 +1,9 @@
 using IPStack.Business;
 using IPStack.Repositories;
 using IPStack.UoW;
+using IPStack.WorkerService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,20 +25,11 @@ namespace IPStack.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            //services.AddDbContext<IPStackDbContext>(options =>
-            //{
-            //    options.UseSqlServer(
-            //        Configuration.GetConnectionString("IPStackDbContext"),
-            //        b =>
-            //        {
-            //            b.MigrationsAssembly("IPStack.Repositories");
-            //        });
-            //});
-
             services.AddIPStackDbContextServices(Configuration);
             services.AddIPStackUoWServices();
             services.AddIPInfoProviderServices();
             services.AddIPStackBusinessServices();
+            services.AddIPStackWorkerService();
             services.AddControllers();
             services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "IP Addresses Details API", Version = "v1" }));
         }

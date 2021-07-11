@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPStack.Repositories", "IPS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPStack.UoW", "IPStack.UoW\IPStack.UoW.csproj", "{7860FC00-9209-4FE8-A58A-ED3A04422A64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPStack.Business", "IPStack.Business\IPStack.Business.csproj", "{BB8C9E24-9AB7-44A9-9C5A-467B6999CC8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPStack.Business", "IPStack.Business\IPStack.Business.csproj", "{BB8C9E24-9AB7-44A9-9C5A-467B6999CC8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPStack.WorkerService", "IPStack.WorkerService\IPStack.WorkerService.csproj", "{4D1061B1-1494-4A8A-9255-9F06D2BF5A6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +57,10 @@ Global
 		{BB8C9E24-9AB7-44A9-9C5A-467B6999CC8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB8C9E24-9AB7-44A9-9C5A-467B6999CC8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB8C9E24-9AB7-44A9-9C5A-467B6999CC8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D1061B1-1494-4A8A-9255-9F06D2BF5A6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D1061B1-1494-4A8A-9255-9F06D2BF5A6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D1061B1-1494-4A8A-9255-9F06D2BF5A6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D1061B1-1494-4A8A-9255-9F06D2BF5A6F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +72,7 @@ Global
 		{F68DCC95-DA7C-4374-B664-4682F8C730C5} = {73CF40E1-55E7-4AB9-98E5-4988530E5DE3}
 		{7860FC00-9209-4FE8-A58A-ED3A04422A64} = {84651569-3CC9-4F4D-90F4-5E66134295B3}
 		{BB8C9E24-9AB7-44A9-9C5A-467B6999CC8F} = {84651569-3CC9-4F4D-90F4-5E66134295B3}
+		{4D1061B1-1494-4A8A-9255-9F06D2BF5A6F} = {BFD288B0-524C-4D80-A3B5-D8C8E8B594AF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00E5D5AF-CDDC-4DD0-8094-D47108575898}
