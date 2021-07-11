@@ -1,4 +1,4 @@
-# IPStack Demo Project
+# ipstack.com Demo Project
 
 This project is using .NET Core (v.3.1) as back-end API in order
 to fetch and store IP address information from https://ipstack.com/
