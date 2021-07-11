@@ -9,7 +9,7 @@ to fetch and store IP address information from https://ipstack.com/
    and under "Single startup project" set "Start" for "IPStack.WebApi" project.
 
 ## Notes:
-This project already includes a local database file (MSSQLLocalDB)
-and a json file with IP addresses (in SolutionItems folder) for you to experiment.
+This project already includes a local database file (MSSQLLocalDB) with several IP addresses 
+details and a json file with IP addresses (in SolutionItems folder) for you to experiment.
 
 Swagger is included so you can easily try the API.
