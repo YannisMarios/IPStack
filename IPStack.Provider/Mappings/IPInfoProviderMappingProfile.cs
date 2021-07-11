@@ -8,10 +8,10 @@ namespace IPStack.Adapter.Mappings
     {
         public IPInfoProviderMappingProfile()
         {
-            InfrastructureToDomain();
+            InfrastructureToEntity();
         }
 
-        private void InfrastructureToDomain()
+        private void InfrastructureToEntity()
         {
             _ = CreateMap<ApiResponse, IPDetails>()
                 .ForMember(dest => dest.Id, src => src.Ignore());

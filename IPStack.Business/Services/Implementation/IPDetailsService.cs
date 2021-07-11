@@ -8,6 +8,7 @@ using IPStack.UoW;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace IPStack.Business.Services.Implementation
@@ -22,25 +23,31 @@ namespace IPStack.Business.Services.Implementation
         #endregion
 
         #region Constructor
-        public IPDetailsService(IUnitOfWork unitOfWork, IMapper mapper, IIPInfoProvider ipInfoProvider) : base(unitOfWork, ipInfoProvider)
+        public IPDetailsService(IUnitOfWork unitOfWork, IIPInfoProvider ipInfoProvider) : base(unitOfWork, ipInfoProvider)
         {
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
         #endregion
 
         #region Public Methods
         public async Task<IPDetails> GetIPDetails(string ip)
         {
-            if(ip is null)
+            if (ip is null)
             {
                 throw new ArgumentNullException(nameof(ip));
+            }
+
+            bool isValidIPAddress = IPAddress.TryParse(ip.Trim(), out IPAddress parsedIPAddress);
+
+            if (!isValidIPAddress)
+            {
+                throw new FormatException($"{ip} is not a valid IP address");
             }
 
             var ipDetails = await UnitOfWork.IPDetailsRepository.GetIPDetails(ip);
 
             if(ipDetails is null)
             {
-                ipDetails = await IPInfoProvider.GetDetails(ip);
+                ipDetails = await IPInfoProvider.GetDetails(parsedIPAddress);
                 UnitOfWork.IPDetailsRepository.Add(ipDetails);
                 _ = await UnitOfWork.SaveChangesAsync();
             }
@@ -78,7 +85,7 @@ namespace IPStack.Business.Services.Implementation
 
             if(!ipDetailsList.Any())
             {
-                throw new ArgumentOutOfRangeException(nameof(ipDetailsList));
+                throw new ArgumentOutOfRangeException("You must provide a non-empty array of IP details");
             }
 
             var job = await UnitOfWork.JobRepository.FindAsync(jobId);
@@ -90,7 +97,7 @@ namespace IPStack.Business.Services.Implementation
 
             var tasks = new List<Task>();
 
-            foreach (var batch in ipDetailsList.Batch(1))
+            foreach (var batch in ipDetailsList.Batch(10))
             {
                 var ids = batch.Select(x => x.Id);
                 var entities = await UnitOfWork.IPDetailsRepository.GetManyByIDs(ids);
@@ -109,12 +116,13 @@ namespace IPStack.Business.Services.Implementation
                             entity.Longitude = item.Longitude;
                         }
                     }
-                    job.Progress += 1;
+                    job.Progress += 10;
                     job.Status = job.Progress == job.Total ? JobStatusEnum.COMPLETED : JobStatusEnum.INPROGRESS;
                     UnitOfWork.IPDetailsRepository.UpdateRange(entities);
                     UnitOfWork.JobRepository.Update(job);
                     await UnitOfWork.SaveChangesAsync();
-                    await Task.Delay(5000);
+                    // This was added on purpose so we have plenty of time to check batch update progress
+                    await Task.Delay(10000);
                 }
             }
 

@@ -41,20 +41,22 @@ namespace IPStack.Repositories.Repositories.Implementation
         /// <param name="configuration"></param>
         /// <param name="dbContext">The database context.</param>
         /// <param name="cache">The cache.</param>
-        protected CachingRepository(IConfiguration configuration, IPStackDbContext dbContext, IMemoryCache cache, string cacheKey) : base(dbContext)
+        protected CachingRepository(IConfiguration configuration, IPStackDbContext dbContext, IMemoryCache cache) : base(dbContext)
         {
             _cache = cache;
-            _cacheKey = cacheKey ?? throw new ArgumentNullException(nameof(cacheKey));
+            _cacheKey = configuration.GetValue<string>("Caching:CacheKey");
             var absoluteExpiration = configuration.GetValue<int>("Caching:AbsoluteExpirationInMinutes");
-            var slidingExpirationInMinutes = configuration.GetValue<int>("Caching:SlidingExpirationInMinutes");
-            _options = new MemoryCacheEntryOptions()
-                .SetAbsoluteExpiration(DateTime.Now.AddMinutes(absoluteExpiration))
-                .SetSlidingExpiration(TimeSpan.FromMinutes(slidingExpirationInMinutes));
+            _options = new MemoryCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddMinutes(absoluteExpiration));
 
         }
         #endregion
 
         #region Public Methods
+        /// <summary>
+        /// Gets a cache entry by key
+        /// </summary>
+        /// <param name="key">The cache key</param>
+        /// <returns><see cref="T"/>The cached entity</returns>
         public async Task<T> GetByKey(string key)
         {
             var cachedEntity = _cache.Get<T>(key);
@@ -72,6 +74,10 @@ namespace IPStack.Repositories.Repositories.Implementation
             return cachedEntity;
         }
 
+        /// <summary>
+        /// Gets all entities
+        /// </summary>
+        /// <returns><see cref="IEnumerable{T}"/>The entities</returns>
         public override async Task<IEnumerable<T>> GetAllAsync()
         {
             var entities = await base.GetAllAsync();
@@ -86,6 +92,11 @@ namespace IPStack.Repositories.Repositories.Implementation
             return entities;
         }
 
+        /// <summary>
+        /// Updates a list of entities
+        /// </summary>
+        /// <param name="entities">The entities to update</param>
+        /// <returns><see cref="IEnumerable{T}"/>The updated entities</returns>
         public override IEnumerable<T> UpdateRange(IEnumerable<T> entities)
         {
             var dbEntities = base.UpdateRange(entities);
@@ -99,10 +110,14 @@ namespace IPStack.Repositories.Repositories.Implementation
 
 
         #region Protected Methods
+        /// <summary>
+        /// Adds an entry to the cache
+        /// </summary>
+        /// <param name="entry">The entry to add to the cache</param>
         protected void AddToCache(T entry)
         {
             var key = typeof(T).GetProperty(_cacheKey).GetValue(entry);
-            _cache.Remove(key);
+            _cache.CreateEntry(key);
             _cache.Set(key, entry, _options);
         }
         #endregion

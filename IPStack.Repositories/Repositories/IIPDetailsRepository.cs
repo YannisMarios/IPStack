@@ -13,6 +13,11 @@ namespace IPStack.Repositories.Repositories
         /// <returns>A <see cref="IPDetails"/></returns>
         Task<IPDetails> GetIPDetails(string ip);
 
+        /// <summary>
+        /// Gets a list of IP details by their ids
+        /// </summary>
+        /// <param name="ids">The list of ids</param>
+        /// <returns>A <see cref="IEnumerable{IPDetails}"/></returns>
         Task<IEnumerable<IPDetails>> GetManyByIDs(IEnumerable<int> ids);
     }
 }

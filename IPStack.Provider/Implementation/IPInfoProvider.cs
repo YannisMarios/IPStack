@@ -5,7 +5,9 @@ using IPStack.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
+using System.Net;
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
 namespace IPStack.Adapter.Implementation
@@ -50,26 +52,30 @@ namespace IPStack.Adapter.Implementation
         #endregion
 
         #region Public Methods
-        public async Task<IPDetails> GetDetails(string ip)
+        public async Task<IPDetails> GetDetails(IPAddress ip)
         {
             if(ip is null)
             {
                 throw new ArgumentNullException(nameof(ip));
             }
 
-            var uri = BuildUri(ip);
+            var uri = BuildUri(ip.ToString());
             var response = await _httpClient.GetAsync(uri);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new IPServiceNotAvailableException("IPStack service is not available, please try again later");
+            }
 
             IPDetails details;
-            if (response.IsSuccessStatusCode)
+            try
             {
                 var res = await response.Content.ReadAsStringAsync();
                 var deserializedResponse = JsonConvert.DeserializeObject<ApiResponse>(res);
                 details = _mapper.Map<IPDetails>(deserializedResponse);
             }
-            else
+            catch (JsonException)
             {
-                throw new IPServiceNotAvailableException("IPStack service is not available, please try again later");
+               throw new IPServiceNotAvailableException("IP address is not alive");
             }
 
             return details;

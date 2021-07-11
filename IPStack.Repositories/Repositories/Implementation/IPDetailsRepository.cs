@@ -19,7 +19,7 @@ namespace IPStack.Repositories.Repositories.Implementation
         /// <param name="dbContext">The database context.</param>
         /// <param name="cache">The cache.</param>
         public IPDetailsRepository(IConfiguration configuration, IPStackDbContext dbContext, IMemoryCache cache) 
-            : base(configuration, dbContext, cache, "IP")
+            : base(configuration, dbContext, cache)
         {
         }
         #endregion

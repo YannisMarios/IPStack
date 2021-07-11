@@ -2,6 +2,7 @@
 using IPStack.Adapter.Exceptions;
 using IPStack.Business.Services;
 using IPStack.Domain.Entities;
+using IPStack.WebApi.DTOs;
 using IPStack.WorkerService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +34,6 @@ namespace IPStack.WebApi.Controllers
         /// The IP details service
         /// </summary>
         private readonly IIPDetailsService _ipDetailsService;
-
         #endregion
 
         #region Constructor
@@ -51,7 +51,6 @@ namespace IPStack.WebApi.Controllers
             _queue = queue ?? throw new ArgumentNullException(nameof(queue)); ;
             _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory)); ;
         }
-
         #endregion
 
         #region Endpoints
@@ -62,55 +61,77 @@ namespace IPStack.WebApi.Controllers
         /// <returns>An <see cref="IActionResult"/></returns>
         [HttpGet]
         [Route("GetIPDetails")]
-        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IPDetailsDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetIPDetails([FromQuery] string ip)
         {
-            var ipDetails = await _ipDetailsService.GetIPDetails(ip);
-            return Ok(ipDetails);
+            try
+            {
+                var entity = await _ipDetailsService.GetIPDetails(ip);
+                var dto = Mapper.Map<IPDetailsDTO>(entity);
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
         /// Gets all IP details
         /// </summary>
-        /// <param name="ip">The IP address</param>
         /// <returns>An <see cref="IActionResult"/></returns>
         [HttpGet]
         [Route("GetAll")]
         [ProducesResponseType(typeof(IEnumerable<IPDetails>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
         {
-            var ipDetails = await _ipDetailsService.GetAll();
-            return Ok(ipDetails);
+            var entities = await _ipDetailsService.GetAll();
+            var dtos = entities.Select(x => Mapper.Map<IPDetailsDTO>(x));
+            return Ok(dtos);
         }
 
         /// <summary>
-        /// Gets the details of an IP address
+        /// Batch updates a list of IP address details
         /// </summary>
-        /// <param name="ip">The IP address</param>
+        /// <param name="ipDetailsList">The list of IP address details</param>
         /// <returns>An <see cref="IActionResult"/></returns>
         [HttpPost]
+        [Route("BatchUpdate")]
         [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
         [ProducesResponseType( StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> BatchUpdate([FromBody] List<IPDetails> ipDetailsList)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> BatchUpdate([FromBody] List<IPDetailsDTO> ipDetailsList)
         {
-            if (!ipDetailsList.Any())
+            try
             {
-                return BadRequest("You must provide a non-empty array of IP details");
+                if(ipDetailsList is null)
+                {
+                    throw new ArgumentNullException(nameof(ipDetailsList));
+                }
+
+                if(ipDetailsList.Count == default)
+                {
+                    throw new ArgumentOutOfRangeException("You must provide a non-empty array of IP details");
+                }
+
+                var entities = ipDetailsList.Select(x => Mapper.Map<IPDetails>(x));
+                var jobId = await  _ipDetailsService.CreateJob(ipDetailsList.Count);
+
+                _queue.QueueBackgroundWorkItem(async token =>
+                {
+                    using var scope = _serviceScopeFactory.CreateScope();
+                    var scopedServices = scope.ServiceProvider;
+                    var ipdetailsService = scopedServices.GetService<IIPDetailsService>();
+                    _ = await ipdetailsService.BatchUpdate(jobId, entities);
+                });
+
+                return Ok(jobId);
             }
-
-
-            var jobId = await  _ipDetailsService.CreateJob(ipDetailsList.Count);
-
-            _queue.QueueBackgroundWorkItem(async token =>
+            catch (Exception ex)
             {
-                using var scope = _serviceScopeFactory.CreateScope();
-                var scopedServices = scope.ServiceProvider;
-                var ipdetailsService = scopedServices.GetService<IIPDetailsService>();
-                _ = await ipdetailsService.BatchUpdate(jobId, ipDetailsList);
-            });
-
-
-            return Ok(jobId);
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
